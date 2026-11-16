@@ -388,6 +388,7 @@
   .cz dd { color: var(--soft); font-size: 15.5px; padding-top: 3px; }
   @media (max-width: 560px) { .cz-row { grid-template-columns: 1fr; gap: 4px; } }
 
+  .install-note { max-width: 560px; margin: 22px auto 0; font-size: 14.5px; color: var(--faint); text-align: left; padding-left: 42px; }
   /* Text sections */
   section { padding-block: 96px; }
   section.opening { padding-block: 0 7vh; }
@@ -471,7 +472,7 @@
       <a class="button dark" href="https://github.com/okoushiko/oasis/releases/latest/download/Oasis.zip">Download for Mac</a>
       <a class="button ghost" href="#features">See what it does</a>
     </div>
-    <p class="meta">Version 1.1 · 2 MB · Free · macOS 14 or later · Apple silicon</p>
+    <p class="meta">Version 1.2 · 2 MB · Free · macOS 14 or later · Apple silicon</p>
 
     <div class="mac" id="demo" role="img" aria-label="Demo: clicking Pip in the notch opens Oasis and goes through each tab, then Instagram is opened in a browser and closes itself during Focus mode.">
       <div class="bezel"><div class="screen">
@@ -635,6 +636,18 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
         <h3>School or Work mode</h3><p>Switch to just to-dos, focus and tools when school's out.</p>
       </div>
+      <div class="feat">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v5h-5"/><path d="M9.5 12.5l2 2 3.5-4"/></svg>
+        <h3>Updates itself</h3><p>New versions arrive with one click, and each one is checked with a security signature before it installs.</p>
+      </div>
+      <div class="feat">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><rect x="11" y="10" width="10" height="10" rx="2"/></svg>
+        <h3>Pop-out windows</h3><p>Drag any tab out of the notch to keep it floating over your work.</p>
+      </div>
+      <div class="feat">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12s3.5-6 9-6 9 6 9 6-3.5 6-9 6-9-6-9-6z"/><path d="M4 4l16 16"/></svg>
+        <h3>Private on screen shares</h3><p>Hide Oasis from screen sharing and screenshots, so your list stays yours.</p>
+      </div>
     </div>
   </section>
 
@@ -652,13 +665,14 @@
     <h2>Get Oasis for your notch.</h2>
     <p class="intro">Free, and ready now. Download it, give it one quick approval, and Pip takes it from there.</p>
     <div class="cta"><a class="button dark" href="https://github.com/okoushiko/oasis/releases/latest/download/Oasis.zip">Download for Mac</a><a class="button ghost" href="https://github.com/okoushiko/oasis/releases/latest">Release notes and .dmg</a></div>
-    <div class="specs"><span>Version 1.1</span><span>2 MB</span><span>Free</span><span>macOS 14 or later</span><span>Apple silicon</span></div>
+    <div class="specs"><span>Version 1.2</span><span>2 MB</span><span>Free</span><span>macOS 14 or later</span><span>Apple silicon</span></div>
     <ol class="install">
       <li><b>1</b><span>Open <em>Oasis.zip</em> from your Downloads, then drag Oasis into Applications.</span></li>
       <li><b>2</b><span>Open Oasis. Your Mac says it couldn't verify the app, because Oasis isn't from the App Store. Click <em>Done</em>.</span></li>
       <li><b>3</b><span>Open <em>System Settings → Privacy &amp; Security</em>, scroll down, and click <em>Open Anyway</em> next to Oasis.</span></li>
       <li><b>4</b><span>Open Oasis again and click <em>Open</em>. You only do this once. Pip walks you through the rest.</span></li>
     </ol>
+    <p class="install-note">You only do the Open Anyway step once. After that, Oasis updates itself. On 1.0 or 1.1? Download 1.2 once, and every update after that is automatic.</p>
   </section>
 
   <footer><span>© 2026 Oasis</span><span>Made with Pip</span></footer>
