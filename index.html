@@ -990,13 +990,16 @@
     const introWord = intro.querySelector(".word"), hint = intro.querySelector(".scroll");
     const idle = PIP.slice(); idle[9] = "OBBBEWBBBBEWBBBO"; idle[10] = "OBBBEEBBBBEEBBBO";
     const closed = idle.slice(); closed[9] = "OBBBBBBBBBBBBBBO";
-    const SUB = 6; // each sprite pixel becomes 6×6 small ones
-    const bits = [];
+    const SUB = 12; // each sprite pixel becomes 12×12 small pieces
+    // Pieces fly in from the upper left and snap into place in a wave that runs
+    // from Pip's top-left corner to his bottom-right, like a puzzle coming together.
+    const groups = {};
     PIP.forEach((row, y) => [...row].forEach((ch, x) => {
       if (!COL[ch]) return;
       for (let i = 0; i < SUB; i++) for (let j = 0; j < SUB; j++) {
-        bits.push({ x: x + i / SUB, y: y + j / SUB, color: COL[ch], side: Math.floor(Math.random() * 4), r: Math.random(),
-                    delay: Math.random() * 0.6, spin: (Math.random() - 0.5) * 6 });
+        const fx = x + i / SUB, fy = y + j / SUB, a = Math.PI + Math.random() * Math.PI / 2, d = 0.4 + Math.random() * 0.9;
+        (groups[COL[ch]] = groups[COL[ch]] || []).push({ x: fx, y: fy, dx: Math.cos(a) * d, dy: Math.sin(a) * d,
+                    delay: (fx + fy) / 30 * 1.1 + Math.random() * 0.18 });
       }
     }));
     let W = 0, H = 0;
@@ -1014,7 +1017,7 @@
     const easeBack = t => { t = clamp(t); const c = 1.4; return 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2); };
     const lerp = (a, b, t) => a + (b - a) * t;
 
-    const FLY = 1.1, BUILT = 0.6 + FLY, SHRINK_AT = BUILT + 0.45, IDLE_AT = SHRINK_AT + 0.5;
+    const FLY = 0.55, BUILT = 1.28 + FLY, SHRINK_AT = BUILT + 0.45, IDLE_AT = SHRINK_AT + 0.5;
     const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
     // The intro runs on its own clock. If you scroll before Pip is built, the clock
     // races ahead so the pixels land right away instead of hanging over the page.
@@ -1074,19 +1077,18 @@
       }
 
       if (t < BUILT) {
-        // Small pixels on their way in from all four edges.
+        // Small pieces on their way in, drawn one color at a time (one fill per color keeps thousands smooth).
         const cell = bigSize / 16, size0 = cell / SUB;
         const ox = W / 2 - bigSize / 2, oy = flowY - bigSize / 2; // follow the page
-        for (const b of bits) {
-          const k = ease((t - b.delay) / FLY);
-          if (k <= 0) continue;
-          const sx = b.side === 0 ? b.r * W : b.side === 1 ? W + 20 : b.side === 2 ? b.r * W : -20;
-          const sy = b.side === 0 ? -20 : b.side === 1 ? b.r * H : b.side === 2 ? H + 20 : b.r * H;
-          const x = lerp(sx, ox + b.x * cell, k), y = lerp(sy, oy + b.y * cell, k);
-          // Tiny pixels: plain squares (no rotation) keep thousands of them smooth.
-          const sz = size0 * (0.6 + 0.4 * k) + 0.4;
-          ctx.fillStyle = b.color;
-          ctx.fillRect(x, y, sz, sz);
+        for (const color in groups) {
+          ctx.fillStyle = color; ctx.beginPath();
+          for (const b of groups[color]) {
+            const k = ease((t - b.delay) / FLY);
+            if (k <= 0) continue;
+            const sz = size0 * (0.5 + 0.5 * k) + 0.4;
+            ctx.rect(ox + b.x * cell + b.dx * bigSize * (1 - k), oy + b.y * cell + b.dy * bigSize * (1 - k), sz, sz);
+          }
+          ctx.fill();
         }
       } else {
         // Whole Pip: grin, quick shrink to idle, float; scrolling flies him to the top bar.
