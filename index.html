@@ -974,8 +974,8 @@
     PIP.forEach((row, y) => [...row].forEach((ch, x) => { if (pal[ch]) { g.fillStyle = pal[ch]; g.fillRect(x, y, 1, 1); } }));
   });
 
-  // ---- Intro: hundreds of small pixels fly in from the screen edges and build a
-  // grinning Pip, who shrinks to his idle face and floats. Scrolling carries the
+  // ---- Intro: a big grinning Pip pops in, gives his little squash, then shrinks
+  // to his idle face and floats. Scrolling carries the
   // same Pip up into the logo spot in the top bar.
   (() => {
     // Always open on the intro (browsers otherwise restore the old scroll spot).
@@ -990,16 +990,6 @@
     const introWord = intro.querySelector(".word"), hint = intro.querySelector(".scroll");
     const idle = PIP.slice(); idle[9] = "OBBBEWBBBBEWBBBO"; idle[10] = "OBBBEEBBBBEEBBBO";
     const closed = idle.slice(); closed[9] = "OBBBBBBBBBBBBBBO";
-    const SUB = 2; // each sprite pixel becomes 2×2 small pieces
-    // The pieces pop up in place in a wave that runs from Pip's top-left corner to his bottom-right.
-    const groups = {};
-    PIP.forEach((row, y) => [...row].forEach((ch, x) => {
-      if (!COL[ch]) return;
-      for (let i = 0; i < SUB; i++) for (let j = 0; j < SUB; j++) {
-        const fx = x + i / SUB, fy = y + j / SUB;
-        (groups[COL[ch]] = groups[COL[ch]] || []).push({ x: fx, y: fy, delay: (fx + fy) * 0.045 });
-      }
-    }));
     let W = 0, H = 0;
     const resize = () => {
       const dpr = Math.max(1, devicePixelRatio || 1);
@@ -1015,11 +1005,16 @@
     const easeBack = t => { t = clamp(t); const c = 1.4; return 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2); };
     const lerp = (a, b, t) => a + (b - a) * t;
 
-    const FLY = 0.35, BUILT = 1.4 + FLY, SHRINK_AT = BUILT + 0.45, IDLE_AT = SHRINK_AT + 0.5;
+    const POP_AT = 0.05, POP = 0.6, BUILT = POP_AT + POP, SHRINK_AT = 1.25, IDLE_AT = SHRINK_AT + 0.6;
     const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
     // The intro runs on its own clock. If you scroll before Pip is built, the clock
     // races ahead so the pixels land right away instead of hanging over the page.
     let clockT = 0, lastNow = null, warp = 1;
+    // Start the clock only once the page has loaded, so the zoom isn't spent while
+    // the browser is still busy (it would skip frames and Pip would just appear).
+    let started = document.readyState === "complete";
+    addEventListener("load", () => { started = true; });
+    setTimeout(() => { started = true; }, 2500);
     addEventListener("scroll", () => { if (clockT < IDLE_AT) warp = 9; }, { passive: true });
     let revealed = false;
     let lastSolid = null, lastWordOp = "", placedFor = "", lastBox = null, docked = false;
@@ -1029,26 +1024,36 @@
     addEventListener("resize", () => { slotRect = slot.getBoundingClientRect(); });
     addEventListener("load", () => { slotRect = slot.getBoundingClientRect(); });
 
+    // Each face is drawn once into a tiny 16×16 image; every frame just scales that
+    // image (crisp, no smoothing), so the animation keeps up with 120 Hz screens.
+    const faces = new Map();
+    const face = rows => {
+      let c = faces.get(rows);
+      if (!c) {
+        c = document.createElement("canvas"); c.width = c.height = 16;
+        const g = c.getContext("2d");
+        rows.forEach((row, ry) => [...row].forEach((ch, rx) => { if (COL[ch]) { g.fillStyle = COL[ch]; g.fillRect(rx, ry, 1, 1); } }));
+        faces.set(rows, c);
+      }
+      return c;
+    };
     function drawSprite(rows, x, y, size, squash = 0) {
-      const cell = size / 16;
       ctx.save();
+      ctx.imageSmoothingEnabled = false;
       ctx.translate(x, y + size / 2);
       ctx.scale(1 + squash, 1 - squash);
-      ctx.translate(-size / 2, -size);
-      rows.forEach((row, ry) => [...row].forEach((ch, rx) => {
-        if (!COL[ch]) return;
-        ctx.fillStyle = COL[ch];
-        ctx.fillRect(rx * cell, ry * cell, cell + 0.4, cell + 0.4);
-      }));
+      ctx.drawImage(face(rows), -size / 2, -size, size, size);
       ctx.restore();
     }
 
     function frame(now) {
-      if (lastNow === null) lastNow = now;
-      clockT += Math.min(0.1, (now - lastNow) / 1000) * warp; lastNow = now;
+      if (lastNow === null || !started) lastNow = now;
+      // A late frame moves the clock at most 1/30 s, so no part of the zoom is skipped.
+      clockT += Math.min(1 / 30, (now - lastNow) / 1000) * warp; lastNow = now;
       if (clockT >= IDLE_AT) warp = 1;
       const t = reduce ? 99 : clockT;
-      if (t < BUILT + 0.05 || !lastBox) ctx.clearRect(0, 0, W, H);
+      // Only wipe where Pip was last frame (a full-screen clear every frame is slow on big retina screens).
+      if (!lastBox) ctx.clearRect(0, 0, W, H);
       else ctx.clearRect(lastBox[0], lastBox[1], lastBox[2], lastBox[3]);
 
       const bigSize = Math.min(W * 0.62, H * 0.56);
@@ -1074,24 +1079,13 @@
         hint.style.top = (homeY + idleSize * 0.56 + 26 + Math.min(80, W * 0.09)) + "px";
       }
 
-      if (t < BUILT) {
-        // Pieces popping up in place (with a little overshoot), one fill per color.
-        const cell = bigSize / 16, piece = cell / SUB;
-        const ox = W / 2 - bigSize / 2, oy = flowY - bigSize / 2; // follow the page
-        for (const color in groups) {
-          ctx.fillStyle = color; ctx.beginPath();
-          for (const b of groups[color]) {
-            const k = easeBack((t - b.delay) / FLY);
-            if (k <= 0) continue;
-            const sz = piece * k;
-            ctx.rect(ox + b.x * cell + piece / 2 - sz / 2, oy + b.y * cell + piece / 2 - sz / 2, sz + 0.4, sz + 0.4);
-          }
-          ctx.fill();
-        }
-      } else {
-        // Whole Pip: grin, quick shrink to idle, float; scrolling flies him to the top bar.
-        const shrink = easeBack((t - SHRINK_AT) / 0.5);
-        const restSize = t < SHRINK_AT ? bigSize : lerp(bigSize, idleSize, shrink);
+      {
+        // Whole Pip: pop in, squash, quick shrink to idle, float; scrolling flies him to the top bar.
+        // Eases out of the hold (no jolt), then settles with a small bounce.
+        const shrink = easeBack(easeInOut((t - SHRINK_AT) / 0.6));
+        // Pops in big (a quick grow from nothing), then the same shrink to his idle size as before.
+        const pop = ease((t - POP_AT) / POP);
+        const restSize = t < BUILT ? bigSize * Math.max(0.001, pop) : t < SHRINK_AT ? bigSize : lerp(bigSize, idleSize, shrink);
         // Shrink evenly (in scale, not pixels) and travel on a soft curve: up first,
         // then over to the corner.
         const size = restSize * Math.pow(sr.height / restSize, q);
@@ -1099,7 +1093,7 @@
         const p = q;
         const cx = lerp(W / 2, sr.left + sr.width / 2, q);
         const cy = (q <= 0 ? flowY : lerp(dockTop, sr.top + sr.height / 2, q)) - float;
-        const squash = t < SHRINK_AT ? Math.max(0, 1 - (t - BUILT) / 0.3) * 0.07 : 0;
+        const squash = t >= BUILT ? Math.max(0, 1 - (t - BUILT) / 0.3) * 0.07 : 0;
         if (p < 0.6 && t > IDLE_AT) {
           ctx.fillStyle = `rgba(36,32,27,${0.08 * (1 - p / 0.6)})`;
           ctx.beginPath();
@@ -1116,7 +1110,7 @@
           canvas.style.visibility = parked ? "hidden" : "visible";
           slotImg.style.opacity = parked ? 1 : 0;
         }
-        if (!parked) {
+        if (!parked && t > POP_AT) {
           drawSprite(rows, cx, cy, size, squash);
           lastBox = [cx - size * 0.75, cy - size * 0.75, size * 1.5, size * 1.6];
         }
