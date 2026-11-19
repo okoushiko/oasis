@@ -1010,7 +1010,7 @@
     const easeBack = t => { t = clamp(t); const c = 1.4; return 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2); };
     const lerp = (a, b, t) => a + (b - a) * t;
 
-    const POP_AT = 0.05, POP = 0.6, BUILT = POP_AT + POP, SHRINK_AT = BUILT + 0.1, IDLE_AT = SHRINK_AT + 0.6;
+    const POP_AT = 0.05, POP = 0.6, BUILT = POP_AT + POP, SHRINK_AT = BUILT + 0.15, IDLE_AT = SHRINK_AT + 0.6;
     const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
     // The intro runs on its own clock. If you scroll before Pip is built, the clock
     // races ahead so the pixels land right away instead of hanging over the page.
