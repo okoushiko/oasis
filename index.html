@@ -62,6 +62,7 @@
   .button.dark { background: var(--ink); color: var(--cream); }
   .button.ghost { border: 1px solid var(--line); color: var(--soft); }
   .button .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--mint); }
+  .button.soon { cursor: default; }
   .meta { margin-top: 14px; font-size: 13px; color: var(--faint); }
 
   /* The Mac */
@@ -666,7 +667,7 @@
   <div class="wrap">
     <nav>
       <a class="brand" href="#intro" style="text-decoration:none;color:inherit"><span class="logo-slot" id="logoSlot"><img class="pip pipimg slotimg" alt=""></span><span class="brand-word">Oasis</span></a>
-      <span class="navlinks"><a href="#how">How it works</a><a href="#features">Features</a><a href="#customize">Customize</a><a href="#download">Download</a></span>
+      <span class="navlinks"><a href="#how">How it works</a><a href="#features">Features</a><a href="#customize">Customize</a><a href="#download">Coming soon</a></span>
     </nav>
   </div>
 </header>
@@ -685,11 +686,10 @@
     <h1>Your notch, but helpful.</h1>
     <p>Oasis turns the notch on your MacBook into a calm home for homework, reminders and focus. Click Pip and it's all there.</p>
     <div class="cta">
-      <a class="button dark" href="https://github.com/okoushiko/oasis/releases/latest/download/Oasis.zip">Download for Mac</a>
+      <span class="button dark soon"><span class="dot"></span>Coming soon</span>
       <a class="button ghost" href="#features">See what it does</a>
     </div>
-    <p class="meta">Version 1.9.2 · 4 MB · Free · macOS 14 or later · Apple silicon</p>
-    <p class="meta upd-link"><a href="#download">Still on Oasis 1.0 or 1.1? Download it again to get updates.</a></p>
+    <p class="meta">In development and out shortly · Free · macOS 14 or later · Apple silicon</p>
 
     <div class="mac" id="demo" role="img" aria-label="Demo: clicking Pip in the notch opens Oasis and goes through each tab, then Instagram is opened in a browser and closes itself during Focus mode.">
       <div class="bezel"><div class="screen">
@@ -927,18 +927,10 @@
   <div class="divider"></div>
 
   <section class="download" id="download">
-    <h2>Get Oasis for your notch.</h2>
-    <p class="intro">Free, and ready now. Download it, give it one quick approval, and Pip takes it from there.</p>
-    <div class="upd-note"><b>Got Oasis 1.0 or 1.1?</b> Those first versions can't update themselves. Download Oasis again below and drag it into Applications to replace the old one. After that, Oasis keeps itself up to date.</div>
-    <div class="cta"><a class="button dark" href="https://github.com/okoushiko/oasis/releases/latest/download/Oasis.zip">Download for Mac</a><a class="button ghost" href="https://github.com/okoushiko/oasis/releases/latest">Release notes and .dmg</a></div>
-    <div class="specs"><span>Version 1.9.2</span><span>4 MB</span><span>Free</span><span>macOS 14 or later</span><span>Apple silicon</span></div>
-    <ol class="install">
-      <li><b>1</b><span>Open <em>Oasis.zip</em> from your Downloads, then drag Oasis into Applications.</span></li>
-      <li><b>2</b><span>Open Oasis. Your Mac says it couldn't verify the app, because Oasis isn't from the App Store. Click <em>Done</em>.</span></li>
-      <li><b>3</b><span>Open <em>System Settings → Privacy &amp; Security</em>, scroll down, and click <em>Open Anyway</em> next to Oasis.</span></li>
-      <li><b>4</b><span>Open Oasis again and click <em>Open</em>. You only do this once. Pip walks you through the rest.</span></li>
-    </ol>
-    <p class="install-note">You only do the Open Anyway step once. After that, Oasis keeps itself up to date. New versions install and restart on their own, and it keeps retrying on slow Wi-Fi.</p>
+    <h2>Oasis is almost here.</h2>
+    <p class="intro">We're working on Oasis right now, and it'll be out shortly. It'll be free for any MacBook with a notch.</p>
+    <div class="cta"><span class="button dark soon"><span class="dot"></span>Coming soon</span></div>
+    <div class="specs"><span>Free</span><span>macOS 14 or later</span><span>Apple silicon</span></div>
   </section>
 
   <footer>
